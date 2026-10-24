@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>留的个人主页 · room.lovestory</title>
+<meta name="description" content="你找到我的房间了吗">
+<style>
+:root{
+  --bg:#fff; --bg-soft:#f7f9f9;
+  --fg:#0f1419; --muted:#536471; --faint:#8b98a5;
+  --accent:#1d9bf0; --accent-soft:#f2f8fe; --rose:#e79cb3;
+  --line:#eff3f4; --stroke:#cfd9de;
+  --pad:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#000; --bg-soft:#16181c;
+    --fg:#e7e9ea; --muted:#71767b; --faint:#71767b;
+    --accent-soft:#0b2232; --rose:#f0b4c4;
+    --line:#2f3336; --stroke:#3f4448;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:60px}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.9;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;-webkit-tap-highlight-color:transparent;
+}
+p,h1,h2,ol,ul,figure{margin:0}
+img{max-width:100%;height:auto}
+ol,ul{padding:0;list-style:none}
+::selection{background:var(--accent-soft);color:var(--fg)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.ic{width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+
+.app{
+  position:relative;width:100%;max-width:calc(600px + 2px);margin:0 auto;
+  min-height:100vh;min-height:100dvh;
+  padding-bottom:calc(40px + env(safe-area-inset-bottom));
+  border-left:1px solid transparent;border-right:1px solid transparent;
+}
+@media (min-width:600px){:root{--pad:20px}}
+@media (min-width:768px){
+  .app{border-left-color:var(--line);border-right-color:var(--line)}
+  :root{--pad:24px}
+}
+@media (min-width:1024px){:root{--pad:28px}}
+
+/* 顶栏 */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  display:grid;grid-template-columns:44px 1fr 44px;align-items:center;
+  height:53px;padding:0 6px;
+  background:var(--bg);background:color-mix(in srgb,var(--bg) 88%,transparent);
+  -webkit-backdrop-filter:saturate(180%) blur(12px);
+  backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid transparent;transition:border-color .2s ease;
+}
+.topbar.is-scrolled{border-bottom-color:var(--line)}
+.topbar__icon{
+  width:44px;height:44px;display:grid;place-items:center;
+  border:0;border-radius:999px;background:none;color:var(--fg);cursor:pointer;
+  transition:background .15s ease;
+}
+.topbar__icon:hover{background:var(--bg-soft)}
+.topbar__title{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;line-height:1.25}
+.topbar__title strong{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;font-weight:700;letter-spacing:.01em}
+.topbar__title span{font-size:11px;letter-spacing:.03em;color:var(--faint)}
+
+/* 资料卡 */
+.profile{display:flex;align-items:flex-start;gap:12px;padding:20px var(--pad) 6px}
+.avatar{
+  flex:none;display:grid;place-items:center;
+  width:48px;height:48px;border-radius:999px;
+  background:var(--bg-soft);border:1px solid var(--line);
+  font-size:17px;font-weight:600;line-height:1;color:var(--muted);
+  -webkit-user-select:none;user-select:none;
+}
+.avatar--sm{width:40px;height:40px;font-size:14px}
+.profile__body{min-width:0;flex:1}
+.profile__name{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}
+.profile__name h1{margin:0;font-size:18px;font-weight:800;line-height:1.45;letter-spacing:.02em}
+.handle{font-size:15px;color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.handle:hover{text-decoration-thickness:2px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:0 6px;margin:8px 0 0;font-size:14px;line-height:1.85;color:var(--muted)}
+.meta i{font-style:normal;color:var(--stroke);margin:0 1px}
+.badge{
+  display:inline-block;margin:12px 0 0;padding:6px 11px;
+  border:1px solid var(--stroke);border-radius:8px;
+  font-size:12px;line-height:1.6;color:var(--muted);
+}
+.stats{margin:10px 0 0;font-size:13px;line-height:1.85;color:var(--muted)}
+.stats b{font-size:14px;font-weight:700;color:var(--fg)}
+.stats b.nowrap{white-space:nowrap}
+.sep{margin:0 6px;color:var(--stroke)}
+
+/* 帖子 */
+.post{padding:12px var(--pad) 0}
+.post__pin{display:flex;align-items:center;gap:6px;margin:4px 0 0;font-size:12px;line-height:1.7;color:var(--muted)}
+.post__pin .ic{width:14px;height:14px}
+.post__text{margin:14px 0 0;text-align:right;font-size:17px;line-height:2;letter-spacing:.02em;text-wrap:pretty}
+.post__text p + p{margin-top:8px}
+.post__tags{margin:16px 0 0;text-align:right;font-size:15px;line-height:1.95;letter-spacing:.02em;color:var(--muted)}
+.post__tags p + p{margin-top:4px}
+.post__mention{margin:16px 0 0;text-align:right;font-size:14px;line-height:1.8}
+.post__mention a{
+  display:inline-block;padding:2px 8px;border-radius:6px;
+  color:var(--accent);text-decoration:none;background:var(--accent-soft);
+}
+.post__mention a:hover{text-decoration:underline;text-underline-offset:3px}
+
+/* 配图位 */
+.media{
+  margin:20px 0 0;aspect-ratio:2.33/1;
+  border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  background:var(--bg-soft);
+}
+.media--square{aspect-ratio:1/1}
+.media__img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.media:hover .media__img{transform:scale(1.03)}
+.media__ph{display:grid;height:100%;place-items:center;color:var(--faint)}
+.media__ph-in{display:flex;flex-direction:column;align-items:center;gap:8px}
+.media__ph .ic{width:28px;height:28px;stroke-width:1.25}
+.media__ph span{font-size:12px;line-height:1;letter-spacing:.04em}
+
+.post__time{margin:16px 0 0;font-size:13px;line-height:1.8;color:var(--muted)}
+.post__stats{display:flex;flex-wrap:wrap;gap:0 16px;margin:8px 0 0;font-size:13px;line-height:1.8;color:var(--muted)}
+.post__stats b{font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums}
+
+/* 操作行 */
+.actions{display:flex;align-items:center;justify-content:space-between;margin:8px 0 0;color:var(--muted)}
+.act{
+  display:flex;height:44px;min-width:44px;align-items:center;gap:6px;
+  padding:0 4px;border:0;background:none;color:inherit;
+  font:inherit;font-size:13px;line-height:1;cursor:pointer;
+  transition:color .15s ease;
+}
+.act:hover{color:var(--accent)}
+.act__n{font-variant-numeric:tabular-nums}
+.act.is-on{color:var(--accent)}
+.act.is-on .ic{fill:currentColor}
+@keyframes pop{0%{transform:scale(1)}42%{transform:scale(1.14)}100%{transform:scale(1)}}
+.act.is-pop .ic{animation:pop .34s cubic-bezier(.2,.8,.2,1)}
+
+/* 分割线 */
+.rule{border-top:1px solid var(--line);margin:20px 0}
+@media (min-width:768px){.rule{margin:22px 0}}
+
+/* 评论 */
+.replies{display:flex;flex-direction:column;gap:26px;margin:0;padding:0 var(--pad);list-style:none}
+.reply{display:flex;gap:10px}
+.reply__body{min-width:0;flex:1}
+.reply__head{margin:0;font-size:15px;line-height:1.7}
+.reply__head b{font-weight:700}
+.reply__head .handle{font-size:14px;margin-left:4px}
+.reply__to{margin:2px 0 0;font-size:13px;line-height:1.7;color:var(--muted)}
+.bubble{
+  display:inline-block;max-width:100%;margin:10px 0 0;padding:10px 16px;
+  border:1px solid var(--stroke);border-radius:12px;
+  font-size:15px;line-height:1.75;overflow-wrap:break-word;
+}
+.reply__stats{margin:10px 0 0;font-size:13px;line-height:1.75;color:var(--muted)}
+.reply__stats b{font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums}
+
+/* 提示 / 页脚 */
+.hint{margin:30px var(--pad) 0;text-align:right;font-size:12px;line-height:2;color:var(--faint)}
+.footer{padding:0 var(--pad);font-size:12px;line-height:2;color:var(--faint)}
+.footer p{margin:0}
+
+/* 页尾小字 */
+.more{
+  margin:44px var(--pad) 4px;
+  text-align:center;
+  font-size:12px;line-height:1;letter-spacing:.14em;font-weight:500;
+  color:var(--rose);
+}
+
+/* 轻提示 */
+.toast{
+  position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));z-index:80;
+  padding:11px 18px;border-radius:999px;background:var(--fg);color:var(--bg);
+  font-size:13px;line-height:1;white-space:nowrap;
+  opacity:0;transform:translate(-50%,10px);pointer-events:none;
+  transition:opacity .2s ease,transform .2s ease;
+}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+
+/* 大屏：字号与呼吸感同步放大一档 */
+@media (min-width:1024px){
+  .post__text{font-size:18px}
+  .post__tags{font-size:15.5px}
+  .profile__name h1{font-size:20px}
+  .bubble{font-size:15.5px}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 4h6l-.8 5.2 3.3 3.3H6.5l3.3-3.3z"/><path d="M12 12.5V20"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="3"/><circle cx="8.5" cy="10" r="1.6"/><path d="M4 17l4.8-4.3 3.7 3.2 3.2-2.6L20 17.5"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M20 12a7.5 7.5 0 0 1-7.5 7.5H7L3.5 23v-4.6A7.5 7.5 0 0 1 11 4h1.5A7.5 7.5 0 0 1 20 11.5z"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 3l3 3-3 3"/><path d="M20 6H8a4 4 0 0 0-4 4v1"/><path d="M7 21l-3-3 3-3"/><path d="M4 18h12a4 4 0 0 0 4-4v-1"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path d="M9.5 6C6.5 7.5 5 10 5 13.5c0 2.5 1.3 4 3.3 4 1.8 0 3-1.2 3-2.9 0-1.6-1.1-2.8-2.6-2.8-.3 0-.6 0-.8.1.3-1.7 1.3-3 3-4z"/><path d="M18.5 6C15.5 7.5 14 10 14 13.5c0 2.5 1.3 4 3.3 4 1.8 0 3-1.2 3-2.9 0-1.6-1.1-2.8-2.6-2.8-.3 0-.6 0-.8.1.3-1.7 1.3-3 3-4z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.7-7.5-9.6A4.4 4.4 0 0 1 12 7.8a4.4 4.4 0 0 1 7.5 3.1c0 4.9-7.5 9.6-7.5 9.6z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.8l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8L3.5 10l5.9-.9z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M8.5 13.5l7-5.5M8.5 10.5l7 5.5"/><circle cx="5.5" cy="12" r="2.6"/><circle cx="18.5" cy="6.5" r="2.6"/><circle cx="18.5" cy="17.5" r="2.6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20.5 11.6c0 4.2-3.8 7.6-8.5 7.6-1 0-2-.2-2.9-.5L4 20.5l1.3-3.5A7.3 7.3 0 0 1 3.5 11.6C3.5 7.4 7.3 4 12 4s8.5 3.4 8.5 7.6z"/></symbol>
+</svg>
+
+<div class="app">
+
+  <header class="topbar" id="topbar">
+    <button class="topbar__icon" type="button" aria-label="关闭">
+      <svg class="ic"><use href="#i-close"/></svg>
+    </button>
+    <div class="topbar__title">
+      <strong>留的个人主页</strong>
+      <span>room.lovestory</span>
+    </div>
+    <button class="topbar__icon" type="button" aria-label="更多操作">
+      <svg class="ic"><use href="#i-more"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="profile">
+      <div class="avatar" aria-hidden="true">留</div>
+      <div class="profile__body">
+        <div class="profile__name">
+          <h1>留</h1>
+          <a class="handle" href="#post">@room</a>
+        </div>
+        <p class="meta">
+          <span>24</span><i>/</i><span>T</span><i>/</i><span>土象处女</span>
+        </p>
+        <p class="badge">回击时的分寸是刻意设计好的吗</p>
+        <p class="stats"><b>0</b> 关注<span class="sep">·</span><b class="nowrap">9.8 万</b> 粉丝</p>
+      </div>
+    </section>
+
+    <article class="post" id="post">
+      <p class="post__pin">
+        <svg class="ic"><use href="#i-pin"/></svg>置顶
+      </p>
+
+      <div class="post__text">
+        <p>留白是很重要的，无论是人和人之间的关系还是探索世界</p>
+        <p>我宁可只存活于人记忆里鲜活的一瞬间，也不要作为物品一样被长久地使用和消耗</p>
+      </div>
+
+      <div class="post__tags">
+        <p>极度排外</p>
+        <p>不闲聊</p>
+      </div>
+
+      <p class="post__mention"><a href="#">@ 应</a></p>
+
+      <figure class="media media--square">
+        <img class="media__img" src="public/cover.jpg" alt="PATTERN COFFEE 的冰拿铁与树莓甜点" width="1200" height="1200">
+      </figure>
+
+      <p class="post__time">5.20 上午 · 9 月 8 日</p>
+
+      <p class="post__stats">
+        <span><b>521</b> 浏览</span>
+        <span><b>1,800</b> 点赞</span>
+        <span><b>6</b> 转发</span>
+      </p>
+
+      <div class="actions">
+        <button class="act" type="button" aria-label="回复，共 20 条">
+          <svg class="ic"><use href="#i-reply"/></svg><span class="act__n">20</span>
+        </button>
+        <button class="act" type="button" aria-label="转推，共 6 次" data-copy>
+          <svg class="ic"><use href="#i-repeat"/></svg><span class="act__n">6</span>
+        </button>
+        <button class="act" type="button" aria-label="引用，共 3 次" data-copy>
+          <svg class="ic"><use href="#i-quote"/></svg><span class="act__n">3</span>
+        </button>
+        <button class="act" type="button" id="likeAct" aria-pressed="false" aria-label="喜欢">
+          <svg class="ic"><use href="#i-heart"/></svg><span class="act__n" data-count="1800">1,800</span>
+        </button>
+        <button class="act" type="button" id="saveAct" aria-pressed="false" aria-label="书签">
+          <svg class="ic"><use href="#i-star"/></svg><span class="act__n" data-count="0">0</span>
+        </button>
+      </div>
+    </article>
+
+    <div class="rule"></div>
+
+    <ol class="replies">
+      <li class="reply">
+        <div class="avatar avatar--sm" aria-hidden="true">Y</div>
+        <div class="reply__body">
+          <p class="reply__head"><b>YING</b> <a class="handle" href="#">@ying222</a></p>
+          <p class="reply__to">回复 留：</p>
+          <p class="bubble">时间能带走什么？</p>
+          <p class="reply__stats"><b>156</b> 浏览　<b>134</b> 点赞　<b>4</b> 转发</p>
+        </div>
+      </li>
+      <li class="reply">
+        <div class="avatar avatar--sm" aria-hidden="true">M</div>
+        <div class="reply__body">
+          <p class="reply__head"><b>MAI</b> <a class="handle" href="#">@mai0602</a></p>
+          <p class="reply__to">回复 留：</p>
+          <p class="bubble">我不愿意一个人吃冰激凌 TVT</p>
+          <p class="reply__stats"><b>164</b> 浏览　<b>58</b> 点赞　<b>3</b> 转发</p>
+        </div>
+      </li>
+    </ol>
+
+    <p class="hint">打开蓝色下划字体<br>探索房间纱帘后的世界</p>
+
+    <div class="rule"></div>
+
+    <footer class="footer">
+      <p>ip 属地来自 恨海情天</p>
+      <p>纯 le 陪玩团</p>
+    </footer>
+
+    <p class="more">and more....</p>
+
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function () {
+  var topbar = document.getElementById('topbar');
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('is-on'); }, 1600);
+  }
+
+  function onScroll() {
+    topbar.classList.toggle('is-scrolled', window.scrollY > 4);
+  }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* 点赞 / 收藏 */
+  var liked = false, saved = false;
+  var likeCount = 1800, saveCount = 0;
+
+  var likeAct = document.getElementById('likeAct');
+  var saveAct = document.getElementById('saveAct');
+  var likeNum = likeAct.querySelector('.act__n');
+  var saveNum = saveAct.querySelector('.act__n');
+
+  function fmt(n) { return n.toLocaleString('zh-CN'); }
+
+  function pop(el) {
+    el.classList.remove('is-pop');
+    void el.offsetWidth;
+    el.classList.add('is-pop');
+  }
+
+  function render() {
+    var f = 'is-on', p = 'is-pop', pr = 'aria-pressed';
+    likeAct.classList.toggle(f, liked);
+    likeAct.setAttribute(pr, String(liked));
+    likeNum.textContent = fmt(likeCount);
+
+    saveAct.classList.toggle(f, saved);
+    saveAct.setAttribute(pr, String(saved));
+    saveNum.textContent = fmt(saveCount);
+  }
+
+  function toggleLike() {
+    liked = !liked;
+    likeCount = 1800 + (liked ? 1 : 0);
+    render();
+    if (liked) { pop(likeAct); }
+    toast(liked ? '已喜欢' : '已取消喜欢');
+  }
+
+  function toggleSave() {
+    saved = !saved;
+    saveCount = saved ? 1 : 0;
+    render();
+    if (saved) { pop(saveAct); }
+    toast(saved ? '已收藏' : '已取消收藏');
+  }
+
+  likeAct.addEventListener('click', toggleLike);
+  saveAct.addEventListener('click', toggleSave);
+
+  /* 转发 = 复制当前链接 */
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var url = location.href;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(function () { toast('链接已复制'); })
+          .catch(function () { toast('复制失败，请手动复制地址栏'); });
+      } else {
+        toast('已选中地址栏，请复制');
+      }
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
